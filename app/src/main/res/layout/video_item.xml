@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:padding="16dp"
+                android:layout_height="match_parent">
+
+    <FrameLayout
+        android:id="@+id/video_frame"
+        android:layout_width="match_parent"
+        android:layout_height="300dp">
+
+        <VideoView
+                android:id="@+id/item_video"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+        <ImageButton
+            android:id="@+id/video_upload_btn"
+            android:layout_width="wrap_content"
+            android:src="@drawable/ic_publish_black_24dp"
+            android:layout_gravity="center"
+            android:background="@android:drawable/screen_background_light_transparent"
+            android:layout_height="wrap_content"/>
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/item_description"
+        android:layout_width="wrap_content"
+        android:layout_alignStart="@+id/video_frame"
+        android:layout_alignLeft="@+id/video_frame"
+        android:layout_alignEnd="@+id/video_frame"
+        android:layout_alignRight="@+id/video_frame"
+        android:layout_below="@+id/video_frame"
+        android:textSize="20sp"
+        android:text="This describes the video"
+        android:gravity="center_horizontal"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/text_uploaded_by"
+        android:layout_alignStart="@+id/video_frame"
+        android:layout_alignLeft="@+id/video_frame"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_width="260dp"
+        android:layout_alignBaseline="@+id/video_share"
+        android:layout_below="@+id/item_description"
+        android:layout_height="wrap_content"/>
+
+    <ImageButton
+        android:id="@+id/video_share"
+        android:layout_toEndOf="@+id/text_uploaded_by"
+        android:layout_toRightOf="@+id/text_uploaded_by"
+        android:layout_alignEnd="@+id/video_frame"
+        android:layout_alignRight="@+id/video_frame"
+        android:layout_below="@+id/item_description"
+        android:src="@android:drawable/ic_menu_share"
+        android:background="@android:color/transparent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+
+</RelativeLayout>
