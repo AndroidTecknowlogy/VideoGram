@@ -2,6 +2,7 @@ package com.androidtecknowlogy.videogram.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -40,16 +41,30 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
 
         holder.recordedVideo.setVideoURI(videoUris.get(position).getVideoUri());
 
+        /**error listener for videoView to catch all errors
+         * this prevents the users from being notified of unnecessary errors*/
+        holder.recordedVideo.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+            @Override
+            public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
+                return true;
+            }
+        });
+
         holder.recordedVideo.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (holder.recordedVideo.isPlaying())
+                /*if (holder.recordedVideo.isPlaying())
                 {
                     holder.recordedVideo.pause();
                 }
-                else {
-                    holder.recordedVideo.resume();
+                else if (holder.recordedVideo.getCurrentPosition()==0){
+
                 }
+                else {holder.recordedVideo.resume();}*/
+
+                Intent playIntent=new Intent(Intent.ACTION_VIEW,videoUris.get(position).getVideoUri());
+                playIntent.setDataAndType(videoUris.get(position).getVideoUri(),"video/*");
+                context.startActivity(Intent.createChooser(playIntent,"select player"));
                 return true;
             }
         });
@@ -66,8 +81,6 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
         holder.shareVideoBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*add share function*/
-                Toast.makeText(context,"Yet to implement share function",Toast.LENGTH_LONG).show();
 
                 Intent videoShareIntent=new Intent(Intent.ACTION_SEND);
                 videoShareIntent.setType("video/*");
