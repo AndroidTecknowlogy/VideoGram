@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +25,8 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
 
     private Context context;
     private ArrayList<VideoObject> videoUris;
+    private final int FADE_DURATION = 1000;
+
     public VideoAdapter(Context context, ArrayList<VideoObject> videoUris) {
         this.videoUris=videoUris;
         this.context=context;
@@ -76,6 +79,8 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
                 context.startActivity(Intent.createChooser(videoShareIntent,"select medium"));
             }
         });
+
+        setAnimatedView(holder.itemView);
     }
 
     @Override
@@ -98,5 +103,11 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
             recordedBy=(TextView)itemView.findViewById(R.id.text_uploaded_by);
             shareVideoBtn=(ImageButton)itemView.findViewById(R.id.video_share);
         }
+    }
+
+    private void setAnimatedView(View view) {
+        AlphaAnimation animate = new AlphaAnimation(0.0f, 1.0f);
+        animate.setDuration(FADE_DURATION);
+        view.startAnimation(animate);
     }
 }

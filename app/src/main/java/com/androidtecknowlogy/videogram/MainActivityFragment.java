@@ -2,6 +2,7 @@ package com.androidtecknowlogy.videogram;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
@@ -24,6 +25,8 @@ public class MainActivityFragment extends Fragment {
     private static final int VIDEO_CAPTURE_INTENT=2123;
     private RecyclerView videoRecycler;
     private static VideoAdapter videoAdapter;
+    private final String USER = "User: "
+            + Build.MANUFACTURER.toUpperCase()+" "+ Build.MODEL;
 
     public MainActivityFragment() {
     }
@@ -69,7 +72,7 @@ public class MainActivityFragment extends Fragment {
         {
             Log.e("TAG"," ok video");
             Uri videoUri=data.getData();
-            MainActivity.videoUris.add(new VideoObject(videoUri,"Nnabueze"));
+            MainActivity.videoUris.add(new VideoObject(videoUri, USER));
             videoAdapter.notifyDataSetChanged();
 
         }
