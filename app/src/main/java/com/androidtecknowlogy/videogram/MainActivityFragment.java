@@ -8,6 +8,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +40,7 @@ public class MainActivityFragment extends Fragment {
                 takeVideo();
             }
         });
+        videoRecycler=(RecyclerView)view.findViewById(R.id.video_list);
 
         videoRecycler.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager
                 .VERTICAL,false));
@@ -61,12 +63,16 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
+        Log.e("TAG"," start video");
+
         if (requestCode==VIDEO_CAPTURE_INTENT && resultCode==getActivity().RESULT_OK)
         {
+            Log.e("TAG"," ok video");
             Uri videoUri=data.getData();
             MainActivity.videoUris.add(new VideoObject(videoUri,"Nnabueze"));
             videoAdapter.notifyDataSetChanged();
 
         }
+        Log.e("TAG"," after video");
     }
 }

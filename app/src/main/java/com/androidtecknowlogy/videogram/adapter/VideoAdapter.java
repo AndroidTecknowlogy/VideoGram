@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -39,10 +40,17 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
 
         holder.recordedVideo.setVideoURI(videoUris.get(position).getVideoUri());
 
-        holder.recordedVideo.setOnClickListener(new View.OnClickListener() {
+        holder.recordedVideo.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View view) {
-                holder.recordedVideo.start();
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (holder.recordedVideo.isPlaying())
+                {
+                    holder.recordedVideo.pause();
+                }
+                else {
+                    holder.recordedVideo.resume();
+                }
+                return true;
             }
         });
 
@@ -72,7 +80,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
 
     @Override
     public int getItemCount() {
-        return 0;
+        return videoUris.size();
     }
 
     class VideoHolder extends RecyclerView.ViewHolder{

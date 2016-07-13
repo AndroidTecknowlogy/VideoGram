@@ -20,6 +20,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportFragmentManager().beginTransaction().add(R.id.main_frame,new MainActivityFragment())
+                .commit();
         videoUris=new ArrayList<>();
     }
 
