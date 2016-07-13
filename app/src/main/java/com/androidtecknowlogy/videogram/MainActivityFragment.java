@@ -1,5 +1,6 @@
 package com.androidtecknowlogy.videogram;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -7,6 +8,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -23,10 +25,12 @@ import com.androidtecknowlogy.videogram.model.VideoObject;
 public class MainActivityFragment extends Fragment {
 
     private static final int VIDEO_CAPTURE_INTENT=2123;
+    private static final int VIDEO_WATCH=2124;
     private RecyclerView videoRecycler;
     private static VideoAdapter videoAdapter;
     private final String USER = "User: "
             + Build.MANUFACTURER.toUpperCase()+" "+ Build.MODEL;
+    private static FragmentActivity mActivity;
 
     public MainActivityFragment() {
     }
@@ -64,6 +68,12 @@ public class MainActivityFragment extends Fragment {
     }
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mActivity=(FragmentActivity)activity;
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         Log.e("TAG"," start video");
@@ -77,5 +87,10 @@ public class MainActivityFragment extends Fragment {
 
         }
         Log.e("TAG"," after video");
+    }
+
+    public static void chooseVideoPlayer(Intent intent){
+        if (intent.resolveActivity(mActivity.getPackageManager())!=null)
+            mActivity.startActivityForResult(intent,VIDEO_WATCH);
     }
 }
