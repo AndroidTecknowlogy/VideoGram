@@ -1,4 +1,4 @@
-package com.androidtecknowlogy.videogram;
+package com.androidtecknowlogy.videogram.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -16,6 +16,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.androidtecknowlogy.videogram.MainActivity;
+import com.androidtecknowlogy.videogram.R;
 import com.androidtecknowlogy.videogram.adapter.VideoAdapter;
 import com.androidtecknowlogy.videogram.model.VideoObject;
 
@@ -52,7 +54,7 @@ public class MainActivityFragment extends Fragment {
         videoRecycler.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager
                 .VERTICAL,false));
 
-        videoAdapter=new VideoAdapter(getActivity(),MainActivity.videoUris);
+        videoAdapter=new VideoAdapter(getActivity(), MainActivity.videoUris);
         videoRecycler.setAdapter(videoAdapter);
 
         return view;

@@ -7,6 +7,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.androidtecknowlogy.videogram.fragment.SignInFragment;
 import com.androidtecknowlogy.videogram.model.VideoObject;
 
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        getSupportFragmentManager().beginTransaction().add(R.id.main_frame,new MainActivityFragment())
+        getSupportFragmentManager().beginTransaction().add(R.id.main_frame,new SignInFragment())
                 .commit();
         videoUris=new ArrayList<>();
     }
