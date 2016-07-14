@@ -95,4 +95,28 @@ public class MainActivityFragment extends Fragment {
         if (intent.resolveActivity(mActivity.getPackageManager())!=null)
             mActivity.startActivityForResult(intent,VIDEO_WATCH);
     }
+
+    /*@Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            getActivity().getWindow()
+                    .clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+            getActivity().getWindow()
+                    .setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                            WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+            *//*new VideoGram(getActivity()).setDimension(700,700)
+                    .getHolder().setFixedSize(700, 700);*//*
+        }
+        else {
+            getActivity().getWindow()
+                    .setFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN,
+                            WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+
+            *//*new VideoGram(getActivity()).setDimension(700,700)
+                    .getHolder().setFixedSize(700, 700);*//*
+        }
+    }*/
 }

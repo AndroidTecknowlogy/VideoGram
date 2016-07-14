@@ -23,12 +23,12 @@
             <FrameLayout
                 android:id="@+id/video_frame"
                 android:layout_width="match_parent"
-                android:layout_height="200dp">
+                android:layout_height="wrap_content">
 
-                <VideoView
+                <com.androidtecknowlogy.videogram.helper.view.GramView
                     android:id="@+id/item_video"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent" />
 
                 <ImageButton
                     android:id="@+id/video_upload_btn"
@@ -36,7 +36,7 @@
                     android:src="@drawable/ic_publish_black_24dp"
                     android:layout_gravity="center"
                     android:background="@android:drawable/screen_background_light_transparent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
 
             </FrameLayout>
 
@@ -64,7 +64,7 @@
 
                 <ImageButton
                     android:id="@+id/video_share"
-                    android:src="@android:drawable/ic_menu_share"
+                    android:src="@drawable/ic_action_share"
                     android:background="@android:color/transparent"
                     android:layout_gravity="bottom|end"
                     android:layout_width="0dp"

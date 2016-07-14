@@ -3,6 +3,7 @@ package com.androidtecknowlogy.videogram.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.widget.MediaController;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -12,9 +13,9 @@ import android.view.animation.AlphaAnimation;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.VideoView;
 
 import com.androidtecknowlogy.videogram.R;
+import com.androidtecknowlogy.videogram.helper.view.GramView;
 import com.androidtecknowlogy.videogram.model.VideoObject;
 
 import java.util.ArrayList;
@@ -24,9 +25,12 @@ import java.util.ArrayList;
  */
 public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder> {
 
+    private final String LOG_TAG = VideoHolder.class.getSimpleName();
+
     private Context context;
     private ArrayList<VideoObject> videoUris;
     private final int FADE_DURATION = 1000;
+    private MediaController mController;
 
     public VideoAdapter(Context context, ArrayList<VideoObject> videoUris) {
         this.videoUris=videoUris;
@@ -42,6 +46,12 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
     @Override
     public void onBindViewHolder(final VideoHolder holder, final int position) {
 
+
+        MediaController mController = new MediaController(context);
+        mController.setAnchorView(holder.recordedVideo);
+        holder.recordedVideo.setMediaController(mController);
+
+
         holder.recordedVideo.setVideoURI(videoUris.get(position).getVideoUri());
 
         /**error listener for videoView to catch all errors
@@ -52,6 +62,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
                 return true;
             }
         });
+
 
         holder.recordedVideo.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -65,12 +76,36 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
                 }
                 else {holder.recordedVideo.resume();}*/
 
-                Intent playIntent=new Intent(Intent.ACTION_VIEW,videoUris.get(position).getVideoUri());
-                playIntent.setDataAndType(videoUris.get(position).getVideoUri(),"video/*");
-                context.startActivity(Intent.createChooser(playIntent,"select player"));
+                /*Intent playIntent=new Intent(Intent.ACTION_VIEW,videoUris.get(position).getVideoUri());
+                playIntent.setDataAndType(videoUris.get(position).getVideoUri(),"video*//*");
+                context.startActivity(Intent.createChooser(playIntent,"select player"))*/;
+
+                /*holder.recordedVideo.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                    @Override
+                    public void onPrepared(MediaPlayer mediaPlayer) {
+                        Log.e(LOG_TAG, "Video duration: " +holder.recordedVideo.getDuration());
+
+                        ViewGroup.LayoutParams lp =new VideoGram(context)
+                                .setViewParams(mController.getWidth(), mController.getHeight(),
+                                        width, height, holder.recordedVideo);
+
+                        holder.recordedVideo.setLayoutParams(lp);
+                        if(!holder.recordedVideo.isPlaying()) {
+                            holder.recordedVideo.start();
+                        }
+                    }
+
+
+                });*/
+
+                if(!holder.recordedVideo.isPlaying()) {
+                    holder.recordedVideo.start();
+                }
+
                 return true;
             }
         });
+
 
         holder.recordedBy.setText(videoUris.get(position).getUploadedBy());
         holder.uploadBtn.setOnClickListener(new View.OnClickListener() {
@@ -102,7 +137,8 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
     }
 
     class VideoHolder extends RecyclerView.ViewHolder{
-        VideoView recordedVideo;
+        //VideoView recordedVideo;
+        GramView recordedVideo;
         TextView recordedBy;
         ImageButton uploadBtn;
         ImageButton shareVideoBtn;
@@ -111,7 +147,8 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
         public VideoHolder(View itemView) {
             super(itemView);
 
-            recordedVideo=(VideoView)itemView.findViewById(R.id.item_video);
+            //recordedVideo=(VideoView)itemView.findViewById(R.id.item_video);
+            recordedVideo=(GramView) itemView.findViewById(R.id.item_video);
             uploadBtn=(ImageButton)itemView.findViewById(R.id.video_upload_btn);
             recordedBy=(TextView)itemView.findViewById(R.id.text_uploaded_by);
             shareVideoBtn=(ImageButton)itemView.findViewById(R.id.video_share);
@@ -123,4 +160,5 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
         animate.setDuration(FADE_DURATION);
         view.startAnimation(animate);
     }
+
 }
