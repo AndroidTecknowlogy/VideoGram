@@ -27,16 +27,11 @@
 
         </android.support.design.widget.AppBarLayout>
 
-        <FrameLayout android:id="@+id/main_frame"
-            xmlns:android="http://schemas.android.com/apk/res/android"
+        <include layout="@layout/content_main"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/app_bar"/>
-        <!--<include layout="@layout/content_main"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:layout_below="@+id/app_bar"
-            />-->
+            />
     </RelativeLayout>
 
 </android.support.design.widget.CoordinatorLayout>
