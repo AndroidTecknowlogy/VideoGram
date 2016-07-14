@@ -2,7 +2,10 @@ package com.androidtecknowlogy.videogram.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.media.MediaPlayer;
+import android.media.ThumbnailUtils;
+import android.provider.MediaStore;
 import android.widget.MediaController;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,10 +17,12 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.androidtecknowlogy.videogram.MainActivity;
 import com.androidtecknowlogy.videogram.R;
 import com.androidtecknowlogy.videogram.helper.view.GramView;
 import com.androidtecknowlogy.videogram.model.VideoObject;
 
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -53,6 +58,10 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
 
 
         holder.recordedVideo.setVideoURI(videoUris.get(position).getVideoUri());
+        File file=new File(videoUris.get(position).getVideoUri().getPath());
+        Bitmap bitmap=ThumbnailUtils.createVideoThumbnail(file.getAbsolutePath(), MediaStore.Video
+                .Thumbnails.MINI_KIND);
+        MainActivity.videoThumbnails.add(position,bitmap);
 
         /**error listener for videoView to catch all errors
          * this prevents the users from being notified of unnecessary errors*/

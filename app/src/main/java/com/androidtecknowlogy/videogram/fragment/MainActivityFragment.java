@@ -1,11 +1,16 @@
 package com.androidtecknowlogy.videogram.fragment;
 
+import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -15,11 +20,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.androidtecknowlogy.videogram.MainActivity;
 import com.androidtecknowlogy.videogram.R;
 import com.androidtecknowlogy.videogram.adapter.VideoAdapter;
 import com.androidtecknowlogy.videogram.model.VideoObject;
+import com.androidtecknowlogy.videogram.util.Constants;
+import com.google.firebase.storage.StorageReference;
+
+import java.io.ByteArrayOutputStream;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -32,7 +42,15 @@ public class MainActivityFragment extends Fragment {
     private static VideoAdapter videoAdapter;
     private final String USER = "User: "
             + Build.MANUFACTURER.toUpperCase()+" "+ Build.MODEL;
+
+    private static StorageReference mStorageReference;
+    private static StorageReference mVideoStorage;
+
     private static FragmentActivity mActivity;
+
+
+    /*all intents declared*/
+    private Intent videoIntent;
 
     public MainActivityFragment() {
     }
@@ -42,6 +60,10 @@ public class MainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.fragment_main, container, false);
         FloatingActionButton videoFab = (FloatingActionButton)view.findViewById(R.id.video_fab);
+        mStorageReference=MainActivity.mFirebaseStorage.getReferenceFromUrl(Constants.STORAGE_URL);
+        mVideoStorage=mStorageReference.child("videos");
+
+        setupAndroidMpermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
         videoFab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,14 +79,16 @@ public class MainActivityFragment extends Fragment {
         videoAdapter=new VideoAdapter(getActivity(), MainActivity.videoUris);
         videoRecycler.setAdapter(videoAdapter);
 
+        videoIntent=new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+
         return view;
     }
+
 
     /**starts an intent to record video
      * this is called by the FloatingActionButton videoFab */
     public void takeVideo()
     {
-        Intent videoIntent=new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
         if (videoIntent.resolveActivity(getActivity().getPackageManager())!=null)
             startActivityForResult(videoIntent,VIDEO_CAPTURE_INTENT);
     }
@@ -119,4 +143,63 @@ public class MainActivityFragment extends Fragment {
                     .getHolder().setFixedSize(700, 700);*//*
         }
     }*/
+
+    @TargetApi(23)
+    public void setupAndroidMpermissions(String permissionName){
+        if (getActivity().checkSelfPermission(permissionName)!= PackageManager.PERMISSION_GRANTED)
+        {
+            switch (permissionName)
+            {
+                case Manifest.permission.CAMERA:
+                    getActivity().requestPermissions(new String[]{permissionName},
+                            Constants.RUNTIME_CAMERA_PERMISSION);
+                    break;
+                case Manifest.permission.WRITE_EXTERNAL_STORAGE:
+                    getActivity().requestPermissions(new String[]{permissionName},
+                            Constants.RUNTIME_SDCARD_PERMISSION);
+                    break;
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode==Constants.RUNTIME_CAMERA_PERMISSION)
+        {
+            if (grantResults[0]==PackageManager.PERMISSION_GRANTED)
+            {
+                startActivityForResult(videoIntent,VIDEO_CAPTURE_INTENT);
+            }
+            else {
+                Toast.makeText(getActivity(),"You need to accept the camera permission request",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        if (requestCode==Constants.RUNTIME_SDCARD_PERMISSION)
+        {
+            if (grantResults[0]==PackageManager.PERMISSION_GRANTED)
+            {
+                Toast.makeText(getActivity(),"Granted!",
+                        Toast.LENGTH_SHORT).show();
+            }
+            else {
+                Toast.makeText(getActivity(),"You need to accept the camera permission request",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+
+    public synchronized void uploadVideoFile(int position){
+
+        Bitmap bitmap=MainActivity.videoThumbnails.get(position);
+        ByteArrayOutputStream baos=new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG,100,baos);
+        byte[] data=baos.toByteArray();
+        
+
+    }
 }
