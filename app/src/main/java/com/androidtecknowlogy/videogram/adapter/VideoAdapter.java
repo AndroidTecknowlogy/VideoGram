@@ -3,9 +3,11 @@ package com.androidtecknowlogy.videogram.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
-import android.media.ThumbnailUtils;
+import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.widget.MediaController;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,10 +21,11 @@ import android.widget.Toast;
 
 import com.androidtecknowlogy.videogram.MainActivity;
 import com.androidtecknowlogy.videogram.R;
-import com.androidtecknowlogy.videogram.helper.view.GramView;
+import com.androidtecknowlogy.videogram.helper.view.GramImage;
+import com.androidtecknowlogy.videogram.helper.view.GramVideo;
 import com.androidtecknowlogy.videogram.model.VideoObject;
+import com.dd.CircularProgressButton;
 
-import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -36,6 +39,9 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
     private ArrayList<VideoObject> videoUris;
     private final int FADE_DURATION = 1000;
     private MediaController mController;
+
+    private ImageButton getUpBtn;
+    private CircularProgressButton getUpCir;
 
     public VideoAdapter(Context context, ArrayList<VideoObject> videoUris) {
         this.videoUris=videoUris;
@@ -54,13 +60,24 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
 
         MediaController mController = new MediaController(context);
         mController.setAnchorView(holder.recordedVideo);
+
+        holder.recordedVideo.setVisibility(View.INVISIBLE);
         holder.recordedVideo.setMediaController(mController);
-
-
         holder.recordedVideo.setVideoURI(videoUris.get(position).getVideoUri());
-        File file=new File(videoUris.get(position).getVideoUri().getPath());
-        Bitmap bitmap=ThumbnailUtils.createVideoThumbnail(file.getAbsolutePath(), MediaStore.Video
-                .Thumbnails.MINI_KIND);
+
+        /*File file=new File(videoUris.get(position).getVideoUri().getPath());
+        Bitmap bitmap=ThumbnailUtils.createVideoThumbnail(file.getAbsolutePath(),
+                MediaStore.Video.Thumbnails.MINI_KIND);*/
+
+        BitmapFactory.Options opt = new BitmapFactory.Options();
+        opt.inSampleSize = 1;
+        Bitmap bitmap = MediaStore.Video.Thumbnails.getThumbnail(context.getContentResolver(),
+                getUriId(videoUris.get(position).getVideoUri()), MediaStore.Video.Thumbnails.MINI_KIND, opt);
+
+        if(bitmap != null){
+            Log.e(LOG_TAG, "Bitmap: " + bitmap.toString());
+            holder.recordThumbnail.setImageBitmap(bitmap);
+        }
         MainActivity.videoThumbnails.add(position,bitmap);
 
         /**error listener for videoView to catch all errors
@@ -73,7 +90,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
         });
 
 
-        holder.recordedVideo.setOnTouchListener(new View.OnTouchListener() {
+        holder.recordThumbnail.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 /*if (holder.recordedVideo.isPlaying())
@@ -92,35 +109,47 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
                 /*holder.recordedVideo.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
                     public void onPrepared(MediaPlayer mediaPlayer) {
-                        Log.e(LOG_TAG, "Video duration: " +holder.recordedVideo.getDuration());
+                        Log.e(LOG_TAG, "Video duration: "
+                                +holder.recordedVideo.getDuration());
 
-                        ViewGroup.LayoutParams lp =new VideoGram(context)
-                                .setViewParams(mController.getWidth(), mController.getHeight(),
-                                        width, height, holder.recordedVideo);
+                        holder.recordThumbnail.setVisibility(View.INVISIBLE);
+                        holder.recordedVideo.setVisibility(View.VISIBLE);
+                        holder.recordedVideo.start();
 
-                        holder.recordedVideo.setLayoutParams(lp);
                         if(!holder.recordedVideo.isPlaying()) {
-                            holder.recordedVideo.start();
+                            holder.recordedVideo.setVisibility(View.INVISIBLE);
+                            holder.recordThumbnail.setVisibility(View.VISIBLE);
                         }
                     }
 
-
                 });*/
-
-                if(!holder.recordedVideo.isPlaying()) {
-                    holder.recordedVideo.start();
-                }
+                holder.recordThumbnail.setVisibility(View.INVISIBLE);
+                holder.recordedVideo.setVisibility(View.VISIBLE);
+                holder.recordedVideo.start();
 
                 return true;
             }
         });
 
 
+        if(!holder.recordedVideo.isPlaying()) {
+            holder.recordedVideo.setVisibility(View.INVISIBLE);
+            holder.recordThumbnail.setVisibility(View.VISIBLE);
+        }
+
         holder.recordedBy.setText(videoUris.get(position).getUploadedBy());
         holder.uploadBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 /*add upload function*/
+
+                holder.uploadBtn.setVisibility(View.INVISIBLE);
+                holder.upLoadProgress.setVisibility(View.VISIBLE);
+                holder.upLoadProgress.setIndeterminateProgressMode(true);
+                holder.upLoadProgress.setProgress(20);
+
+                getUpBtn = holder.uploadBtn;
+                getUpCir = holder.upLoadProgress;
                 Toast.makeText(context,"Yet to implement upload function",Toast.LENGTH_LONG).show();
             }
         });
@@ -147,8 +176,10 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
 
     class VideoHolder extends RecyclerView.ViewHolder{
         //VideoView recordedVideo;
-        GramView recordedVideo;
+        GramVideo recordedVideo;
+        GramImage recordThumbnail;
         TextView recordedBy;
+        CircularProgressButton upLoadProgress;
         ImageButton uploadBtn;
         ImageButton shareVideoBtn;
 
@@ -157,7 +188,9 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
             super(itemView);
 
             //recordedVideo=(VideoView)itemView.findViewById(R.id.item_video);
-            recordedVideo=(GramView) itemView.findViewById(R.id.item_video);
+            recordedVideo=(GramVideo) itemView.findViewById(R.id.item_video);
+            recordThumbnail = (GramImage) itemView.findViewById(R.id.video_thumbnail);
+            upLoadProgress =(CircularProgressButton) itemView.findViewById(R.id.upload_progress);
             uploadBtn=(ImageButton)itemView.findViewById(R.id.video_upload_btn);
             recordedBy=(TextView)itemView.findViewById(R.id.text_uploaded_by);
             shareVideoBtn=(ImageButton)itemView.findViewById(R.id.video_share);
@@ -170,4 +203,27 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
         view.startAnimation(animate);
     }
 
+    private long getUriId(Uri uri) {
+
+        if(uri != null){
+            String getUri = uri.getPath().trim();
+
+            String[] separator = getUri.split("/");
+            int getSeparatorLast = 0;
+            for(int count =0; count <separator.length; count ++) {
+                getSeparatorLast = count;
+            }
+            return Long.valueOf(separator[getSeparatorLast]);
+        }
+        return 0;
+    }
+
+    private void stopProgress() {
+
+        getUpCir.setProgress(0);
+        getUpCir.setIndeterminateProgressMode(false);
+        getUpCir.setVisibility(View.INVISIBLE);
+        getUpBtn.setVisibility(View.VISIBLE);
+
+    }
 }

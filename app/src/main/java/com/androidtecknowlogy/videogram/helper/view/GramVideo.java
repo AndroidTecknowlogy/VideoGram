@@ -9,24 +9,24 @@ import android.widget.VideoView;
  * Created by AGBOMA franklyn on 7/14/16.
  */
 
-public class GramView extends VideoView{
+public class GramVideo extends VideoView{
 
-    private final String LOG_TAG = GramView.class.getSimpleName();
+    private final String LOG_TAG = GramVideo.class.getSimpleName();
 
     private Context context;
     private int vHeight = 0;
     private int vWidth = 0;
 
 
-    public GramView(Context context) {
+    public GramVideo(Context context) {
         super(context);
     }
 
-    public GramView(Context context, AttributeSet attrs) {
+    public GramVideo(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public GramView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public GramVideo(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
@@ -43,13 +43,14 @@ public class GramView extends VideoView{
         int width = getResources().getConfiguration().screenWidthDp;
         Log.e(LOG_TAG, "mobile height = " + height+ " mobile width = " + width);
 
-        this.vHeight = (height / 2) + 120;
+        this.vHeight = (height / 2) + 100;
         vWidth = height;
 
 
         setMeasuredDimension(vWidth, vHeight);
         Log.e(LOG_TAG, "h = " + vHeight+ " w = " + height);
     }
+
 
     /*@Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {

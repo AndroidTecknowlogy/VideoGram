@@ -63,7 +63,7 @@ public class MainActivityFragment extends Fragment {
         mStorageReference=MainActivity.mFirebaseStorage.getReferenceFromUrl(Constants.STORAGE_URL);
         mVideoStorage=mStorageReference.child("videos");
 
-        setupAndroidMpermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        //setupAndroidMpermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
         videoFab.setOnClickListener(new View.OnClickListener() {
             @Override
