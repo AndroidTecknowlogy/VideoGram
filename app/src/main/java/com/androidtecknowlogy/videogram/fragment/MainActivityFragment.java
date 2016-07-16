@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -27,7 +28,13 @@ import com.androidtecknowlogy.videogram.R;
 import com.androidtecknowlogy.videogram.adapter.VideoAdapter;
 import com.androidtecknowlogy.videogram.model.VideoObject;
 import com.androidtecknowlogy.videogram.util.Constants;
+import com.dd.CircularProgressButton;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 
@@ -45,8 +52,10 @@ public class MainActivityFragment extends Fragment {
 
     private static StorageReference mStorageReference;
     private static StorageReference mVideoStorage;
+    private static StorageReference mThumbnailRef;
 
     private static FragmentActivity mActivity;
+    private static String username;
 
 
     /*all intents declared*/
@@ -62,8 +71,15 @@ public class MainActivityFragment extends Fragment {
         FloatingActionButton videoFab = (FloatingActionButton)view.findViewById(R.id.video_fab);
         mStorageReference=MainActivity.mFirebaseStorage.getReferenceFromUrl(Constants.STORAGE_URL);
         mVideoStorage=mStorageReference.child("videos");
+        mThumbnailRef=mStorageReference.child("images");
+
+
+
 
         //setupAndroidMpermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        username= PreferenceManager.getDefaultSharedPreferences(getActivity()).getString
+                (Constants.USERNAME,"Anonymous");
 
         videoFab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -193,13 +209,81 @@ public class MainActivityFragment extends Fragment {
     }
 
 
-    public synchronized void uploadVideoFile(int position){
+    /**this uploads a video file and corresponding thumbnail to server
+     * this is called from the adapter class.  It takes 2 parameters
+     * @param position the position on the list of the video item to be uploaded
+     * @param progressView the progressBar that shows the upload progress*/
+    public static synchronized void uploadVideoFile(final int position, final CircularProgressButton
+            progressView){
 
         Bitmap bitmap=MainActivity.videoThumbnails.get(position);
         ByteArrayOutputStream baos=new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG,100,baos);
         byte[] data=baos.toByteArray();
-        
 
+        progressView.setIndeterminateProgressMode(true);
+        progressView.setProgress(40);
+
+        StorageReference imageRef=mThumbnailRef.child(MainActivity.videoUris.get(position)
+                .getVideoUri().getLastPathSegment());
+
+        UploadTask imageUploadTask=imageRef.putBytes(data);
+        imageUploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                progressView.setProgress(0);
+                progressView.setIndeterminateProgressMode(false);
+
+                StorageMetadata videoData=new StorageMetadata.Builder()
+                        .setContentType("video/*")
+                        .setCustomMetadata(Constants.METADATA_UPLOADED_BY,username)
+                        .build();
+
+                StorageReference videoFile=mVideoStorage.child(MainActivity.videoUris.get(position)
+                        .getVideoUri().getLastPathSegment());
+                UploadTask videoUploadTask=videoFile.putFile(MainActivity.videoUris.get(position)
+                        .getVideoUri(),videoData);
+                videoUploadTask.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+
+                        progressView.setProgress((int)(100* taskSnapshot.getBytesTransferred()
+                                /taskSnapshot.getTotalByteCount()));
+                    }
+                });
+
+                videoUploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                        progressView.setProgress(100);
+                    }
+                });
+
+                videoUploadTask.addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        videoAdapter.stopProgress();
+                        Log.e("failedMain","here");
+                        Toast.makeText(mActivity,"Upload failed\nRetry",Toast.LENGTH_LONG).show();
+                    }
+                });
+
+
+
+            }
+        });
+
+        imageUploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(mActivity,"Upload failed\nRetry",Toast.LENGTH_LONG).show();
+                videoAdapter.stopProgress();
+                Log.e("failedMain","here2");
+            }
+        });
     }
+
+
 }

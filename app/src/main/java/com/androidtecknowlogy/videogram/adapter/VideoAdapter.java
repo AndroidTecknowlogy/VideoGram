@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.androidtecknowlogy.videogram.MainActivity;
 import com.androidtecknowlogy.videogram.R;
+import com.androidtecknowlogy.videogram.fragment.MainActivityFragment;
 import com.androidtecknowlogy.videogram.helper.view.GramImage;
 import com.androidtecknowlogy.videogram.helper.view.GramVideo;
 import com.androidtecknowlogy.videogram.model.VideoObject;
@@ -148,6 +149,8 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
                 holder.upLoadProgress.setIndeterminateProgressMode(true);
                 holder.upLoadProgress.setProgress(20);
 
+                MainActivityFragment.uploadVideoFile(position,holder.upLoadProgress);
+
                 getUpBtn = holder.uploadBtn;
                 getUpCir = holder.upLoadProgress;
                 Toast.makeText(context,"Yet to implement upload function",Toast.LENGTH_LONG).show();
@@ -218,7 +221,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
         return 0;
     }
 
-    private void stopProgress() {
+    public void stopProgress() {
 
         getUpCir.setProgress(0);
         getUpCir.setIndeterminateProgressMode(false);
