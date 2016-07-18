@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -98,6 +99,9 @@ public class MainActivityFragment extends Fragment {
         videoRecycler.setAdapter(videoAdapter);
 
         videoIntent=new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+        videoIntent.putExtra(MediaStore.EXTRA_SCREEN_ORIENTATION,
+                ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
 
         return view;
     }

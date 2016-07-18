@@ -1,6 +1,7 @@
 package com.androidtecknowlogy.videogram.fragment;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -9,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.androidtecknowlogy.videogram.R;
 import com.androidtecknowlogy.videogram.util.Constants;
@@ -50,6 +52,8 @@ public class SignInFragment extends Fragment implements GoogleApiClient.OnConnec
                 startActivityForResult(signInIntent,SIGN_IN_GOOGLE);
             }
         });
+
+        changeSignInText(signInButton);
         return view;
     }
 
@@ -69,6 +73,20 @@ public class SignInFragment extends Fragment implements GoogleApiClient.OnConnec
         }
     }
 
+    protected void changeSignInText(SignInButton signInButton) {
+
+        for(int count = 0; count < signInButton.getChildCount(); count ++) {
+            View signInView = signInButton.getChildAt(count);
+
+            if(signInView instanceof TextView) {
+                TextView text = (TextView) signInView;
+                text.setText("Sign in to VideoGram");
+                text.setTypeface(Typeface.createFromAsset(getActivity().getAssets(),
+                        "fonts/Acme-Regular.ttf"));
+                return;
+            }
+        }
+    }
     /**extracts all needed details stored by google after successful sign in
      * @param googleSignInResult GoogleSignInResult object containing all required details*/
     public void parseSignInResult(GoogleSignInResult googleSignInResult)
