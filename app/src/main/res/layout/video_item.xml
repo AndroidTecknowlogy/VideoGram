@@ -54,7 +54,7 @@
                             android:textSize="13sp"
                             android:background="@android:color/transparent"
                             android:id="@+id/upload_progress"
-                            app:cpb_colorIndicator="@android:color/white"
+                            app:cpb_colorIndicator="@android:color/holo_green_light"
                             app:cpb_textComplete="Successful"
                             app:cpb_textError="Error"
                             app:cpb_textIdle="Error"

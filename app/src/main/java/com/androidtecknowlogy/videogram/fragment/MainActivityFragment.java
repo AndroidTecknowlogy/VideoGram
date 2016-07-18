@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.androidtecknowlogy.videogram.MainActivity;
 import com.androidtecknowlogy.videogram.R;
 import com.androidtecknowlogy.videogram.adapter.VideoAdapter;
+import com.androidtecknowlogy.videogram.helper.ConnectionReceiver;
 import com.androidtecknowlogy.videogram.model.VideoObject;
 import com.androidtecknowlogy.videogram.util.Constants;
 import com.dd.CircularProgressButton;
@@ -68,6 +69,7 @@ public class MainActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.fragment_main, container, false);
+
         FloatingActionButton videoFab = (FloatingActionButton)view.findViewById(R.id.video_fab);
         mStorageReference=MainActivity.mFirebaseStorage.getReferenceFromUrl(Constants.STORAGE_URL);
         mVideoStorage=mStorageReference.child("videos");
@@ -247,9 +249,11 @@ public class MainActivityFragment extends Fragment {
                 videoUploadTask.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                         int progress = (int)(100* taskSnapshot.getBytesTransferred()
+                                 /taskSnapshot.getTotalByteCount());
 
-                        progressView.setProgress((int)(100* taskSnapshot.getBytesTransferred()
-                                /taskSnapshot.getTotalByteCount()));
+                        progressView.setProgress(progress);
+                        progressView.setVisibility(progress >2 ? View.VISIBLE : View.INVISIBLE);
                     }
                 });
 

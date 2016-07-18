@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.androidtecknowlogy.videogram.MainActivity;
 import com.androidtecknowlogy.videogram.R;
 import com.androidtecknowlogy.videogram.fragment.MainActivityFragment;
+import com.androidtecknowlogy.videogram.helper.ConnectionReceiver;
 import com.androidtecknowlogy.videogram.helper.view.GramImage;
 import com.androidtecknowlogy.videogram.helper.view.GramVideo;
 import com.androidtecknowlogy.videogram.model.VideoObject;
@@ -52,6 +53,8 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
     @Override
     public VideoHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view= LayoutInflater.from(context).inflate(R.layout.video_item,parent,false);
+
+        new ConnectionReceiver().onReceive(context, new Intent());
         return new VideoHolder(view);
     }
 
@@ -143,6 +146,12 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
             @Override
             public void onClick(View view) {
                 /*add upload function*/
+
+                if(!ConnectionReceiver.isConnected()) {
+                    Toast.makeText(context, "Not connected, check network settings",
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 holder.uploadBtn.setVisibility(View.INVISIBLE);
                 holder.upLoadProgress.setVisibility(View.VISIBLE);
@@ -236,5 +245,4 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
         getUpBtn.setVisibility(View.INVISIBLE);
 
     }
-
 }
