@@ -257,14 +257,14 @@ public class MainActivityFragment extends Fragment {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
-                        progressView.setProgress(100);
+                        videoAdapter.stopProgressOnSuccess();
                     }
                 });
 
                 videoUploadTask.addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        videoAdapter.stopProgress();
+                        videoAdapter.stopProgressOnFailed();
                         Log.e("failedMain","here");
                         Toast.makeText(mActivity,"Upload failed\nRetry",Toast.LENGTH_LONG).show();
                     }
@@ -279,7 +279,7 @@ public class MainActivityFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Toast.makeText(mActivity,"Upload failed\nRetry",Toast.LENGTH_LONG).show();
-                videoAdapter.stopProgress();
+                videoAdapter.stopProgressOnFailed();
                 Log.e("failedMain","here2");
             }
         });

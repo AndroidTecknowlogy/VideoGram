@@ -41,8 +41,8 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
     private final int FADE_DURATION = 1000;
     private MediaController mController;
 
-    private ImageButton getUpBtn;
-    private CircularProgressButton getUpCir;
+    private  ImageButton getUpBtn;
+    private  CircularProgressButton getUpCir;
 
     public VideoAdapter(Context context, ArrayList<VideoObject> videoUris) {
         this.videoUris=videoUris;
@@ -146,10 +146,10 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
 
                 holder.uploadBtn.setVisibility(View.INVISIBLE);
                 holder.upLoadProgress.setVisibility(View.VISIBLE);
-                holder.upLoadProgress.setIndeterminateProgressMode(true);
-                holder.upLoadProgress.setProgress(20);
+                /*holder.upLoadProgress.setIndeterminateProgressMode(true);
+                holder.upLoadProgress.setProgress(20);*/
 
-                MainActivityFragment.uploadVideoFile(position,holder.upLoadProgress);
+                MainActivityFragment.uploadVideoFile(position, holder.upLoadProgress);
 
                 getUpBtn = holder.uploadBtn;
                 getUpCir = holder.upLoadProgress;
@@ -221,12 +221,20 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
         return 0;
     }
 
-    public void stopProgress() {
+    public void stopProgressOnFailed() {
 
         getUpCir.setProgress(0);
-        getUpCir.setIndeterminateProgressMode(false);
         getUpCir.setVisibility(View.INVISIBLE);
         getUpBtn.setVisibility(View.VISIBLE);
 
     }
+
+    public void stopProgressOnSuccess() {
+
+        getUpCir.setProgress(100);
+        getUpCir.setVisibility(View.INVISIBLE);
+        getUpBtn.setVisibility(View.INVISIBLE);
+
+    }
+
 }
