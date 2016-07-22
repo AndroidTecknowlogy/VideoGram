@@ -8,7 +8,6 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
@@ -16,6 +15,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -27,18 +27,26 @@ import android.widget.Toast;
 import com.androidtecknowlogy.videogram.MainActivity;
 import com.androidtecknowlogy.videogram.R;
 import com.androidtecknowlogy.videogram.adapter.VideoAdapter;
-import com.androidtecknowlogy.videogram.helper.ConnectionReceiver;
+import com.androidtecknowlogy.videogram.model.StoreHelper;
 import com.androidtecknowlogy.videogram.model.VideoObject;
 import com.androidtecknowlogy.videogram.util.Constants;
 import com.dd.CircularProgressButton;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -49,14 +57,18 @@ public class MainActivityFragment extends Fragment {
     private static final int VIDEO_WATCH=2124;
     private RecyclerView videoRecycler;
     private static VideoAdapter videoAdapter;
-    private final String USER = "User: "
-            + Build.MANUFACTURER.toUpperCase()+" "+ Build.MODEL;
+    private static String USER;
 
     private static StorageReference mStorageReference;
     private static StorageReference mVideoStorage;
     private static StorageReference mThumbnailRef;
 
+    //firebaseDatabase
+    private static FirebaseDatabase mFirebaseDatabase;
+    private static DatabaseReference mDatabaseReference;
+
     private static FragmentActivity mActivity;
+    private static MainActivityFragment instance;
     private static String username;
 
 
@@ -71,18 +83,29 @@ public class MainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.fragment_main, container, false);
 
+        if (getActivity()!=null &&
+                ((AppCompatActivity)getActivity()).getSupportActionBar()!=null &&
+                !((AppCompatActivity) getActivity()).getSupportActionBar().isShowing())
+        {
+            ((AppCompatActivity)getActivity()).getSupportActionBar().show();
+        }
+
         FloatingActionButton videoFab = (FloatingActionButton)view.findViewById(R.id.video_fab);
         mStorageReference=MainActivity.mFirebaseStorage.getReferenceFromUrl(Constants.STORAGE_URL);
         mVideoStorage=mStorageReference.child("videos");
         mThumbnailRef=mStorageReference.child("images");
+        instance=this;
 
-
+        mFirebaseDatabase=FirebaseDatabase.getInstance();
+        mDatabaseReference=mFirebaseDatabase.getReference().child("storage data");
 
 
         //setupAndroidMpermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
         username= PreferenceManager.getDefaultSharedPreferences(getActivity()).getString
                 (Constants.USERNAME,"Anonymous");
+
+        USER="Uploaded by: "+username;
 
         videoFab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -227,11 +250,14 @@ public class MainActivityFragment extends Fragment {
         bitmap.compress(Bitmap.CompressFormat.JPEG,100,baos);
         byte[] data=baos.toByteArray();
 
+        final String pathName=username+"_"+MainActivity.videoUris
+                .get(position)
+                .getVideoUri().getLastPathSegment();
+
         progressView.setIndeterminateProgressMode(true);
         progressView.setProgress(40);
 
-        StorageReference imageRef=mThumbnailRef.child(MainActivity.videoUris.get(position)
-                .getVideoUri().getLastPathSegment());
+        final StorageReference imageRef=mThumbnailRef.child(pathName);
 
         UploadTask imageUploadTask=imageRef.putBytes(data);
         imageUploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -246,9 +272,8 @@ public class MainActivityFragment extends Fragment {
                         .setCustomMetadata(Constants.METADATA_UPLOADED_BY,username)
                         .build();
 
-                StorageReference videoFile=mVideoStorage.child(MainActivity.videoUris.get(position)
-                        .getVideoUri().getLastPathSegment());
-                UploadTask videoUploadTask=videoFile.putFile(MainActivity.videoUris.get(position)
+                final StorageReference videoFile=mVideoStorage.child(pathName);
+                final UploadTask videoUploadTask=videoFile.putFile(MainActivity.videoUris.get(position)
                         .getVideoUri(),videoData);
                 videoUploadTask.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                     @Override
@@ -265,7 +290,10 @@ public class MainActivityFragment extends Fragment {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
-                        videoAdapter.stopProgressOnSuccess();
+                        instance.storeFileMetaData(imageRef.getDownloadUrl().toString(),videoFile
+                                .getDownloadUrl().toString());
+
+
                     }
                 });
 
@@ -293,5 +321,61 @@ public class MainActivityFragment extends Fragment {
         });
     }
 
+    public static synchronized void downloadVideoThumbnails(int position)
+    {
+        /*get list of all uploaded files*/
 
-}
+        /*download files one by one*/
+    }
+
+    public File createImageFolder(String folderName)
+    {
+        File file=new File(getActivity().getApplicationContext().getFilesDir(),folderName);
+
+        if (!file.exists())
+        {
+            file.mkdir();
+        }
+
+        return file;
+    }
+
+    public void saveDownloadedImage(String directory,String imageName,Bitmap imageToSave)
+    {
+        File file=new File(directory,imageName);
+        if (file.exists())
+            file.delete();
+
+        try {
+            FileOutputStream outputStream=new FileOutputStream(file);
+            imageToSave.compress(Bitmap.CompressFormat.JPEG,100,outputStream);
+            outputStream.flush();
+            outputStream.close();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+        }
+
+    public void storeFileMetaData(String imageUrl,String videoUrl)
+    {
+        String key=mDatabaseReference.push().getKey();
+        StoreHelper helper=new StoreHelper(imageUrl,videoUrl);
+        Map<String,Object> item=helper.toMap();
+        Map<String,Object> childUpdate=new HashMap<>();
+        childUpdate.put("/"+key+"/",item);
+
+        mDatabaseReference.updateChildren(childUpdate).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                Toast.makeText(getActivity(),"success",Toast.LENGTH_SHORT).show();
+                videoAdapter.stopProgressOnSuccess();
+            }
+        });
+    }
+
+    }
+
+
+

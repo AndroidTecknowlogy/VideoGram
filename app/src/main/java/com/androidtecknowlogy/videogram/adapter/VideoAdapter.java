@@ -7,15 +7,15 @@ import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.util.Log;
-import android.widget.MediaController;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.widget.ImageButton;
+import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -162,7 +162,6 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoHolder>
 
                 getUpBtn = holder.uploadBtn;
                 getUpCir = holder.upLoadProgress;
-                Toast.makeText(context,"Yet to implement upload function",Toast.LENGTH_LONG).show();
             }
         });
 

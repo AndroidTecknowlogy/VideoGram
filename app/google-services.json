@@ -1,7 +1,9 @@
 {
   "project_info": {
     "project_number": "1067713536565",
-    "project_id": "firebase-videogram"
+    "firebase_url": "https://fir-videogram.firebaseio.com",
+    "project_id": "firebase-videogram",
+    "storage_bucket": "firebase-videogram.appspot.com"
   },
   "client": [
     {
@@ -29,6 +31,10 @@
           }
         },
         {
+          "client_id": "1067713536565-1gg9ifr6snbosucn5sj2fnm69eodtfl3.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
           "client_id": "1067713536565-5bhfgth4vmoq5rmcocq3ncj7bmm777qn.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -43,11 +49,16 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1067713536565-1gg9ifr6snbosucn5sj2fnm69eodtfl3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
-          "status": 1
+          "status": 2
         }
       }
     }

@@ -13,4 +13,8 @@ public class Constants {
 
     /*video metadata*/
     public static final String METADATA_UPLOADED_BY="uploaded_by";
+
+    public static final String EMPTY="no_photo";
+    public static final String PHOTO_URL="link";
+
 }
